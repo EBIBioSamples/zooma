@@ -26,10 +26,39 @@ public interface AnnotationPrediction extends Annotation {
      */
     Confidence getConfidence();
 
-    enum Confidence {
-        HIGH,
-        GOOD,
-        MEDIUM,
-        LOW
+    enum Confidence 
+    {
+    		LOW ( 12.5 ), MEDIUM ( 37.5 ), GOOD ( 62.5 ), HIGH ( 87.5 );
+        
+        private final double score;
+        
+        private Confidence ( double score ) {
+        	this.score = score;
+        }
+
+        /**
+         * In order to help some degree of backward compatibility, a numerical 0-100 percent value is associated to 
+         * each confidence level.
+         * 
+         * Score values are, in order, 12.5, 37.5, 62.5, 87.5. These are the centres of the quartile intervals 
+         * (0, 25, 50, 75, 100) and {@link #fromScore(double)} returns the first confidence value that is &lt= to the
+         * parameter of that method, that is the parameter is associated to the closest quartile.
+         *
+         */
+				public double getScore ()
+				{
+					return score;
+				}
+				
+				/**
+				 * @return a confidence level such that the parameter is closest to the corresponding quartile.
+				 * @see #getScore().
+				 */
+				public static Confidence fromScore ( double score ) 
+				{
+					for ( Confidence conf: Confidence.values () )
+						if ( score <= conf.getScore () ) return conf;
+					return HIGH;
+				}
     }
 }

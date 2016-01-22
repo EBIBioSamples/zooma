@@ -3,10 +3,10 @@ package uk.ac.ebi.fgpt.zooma.search.ontodiscover;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static uk.ac.ebi.fgpt.zooma.search.ZOOMASearchClientTest.ZOOMA_BASE_URL;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
@@ -15,16 +15,16 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
+import uk.ac.ebi.fgpt.zooma.model.AnnotationPrediction;
 import uk.ac.ebi.fgpt.zooma.search.ZOOMASearchClient;
 import uk.ac.ebi.onto_discovery.api.CachedOntoTermDiscoverer;
 import uk.ac.ebi.onto_discovery.api.OntoTermDiscoveryMemCache;
 import uk.ac.ebi.onto_discovery.api.OntologyTermDiscoverer;
 import uk.ac.ebi.onto_discovery.api.OntologyTermDiscoverer.DiscoveredTerm;
-import uk.ac.ebi.utils.memory.SimpleCache;
 import uk.ac.ebi.utils.time.XStopWatch;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * Tests the uk.ac.ebi.fgpt.zooma.search.ontodiscover package.
@@ -40,7 +40,11 @@ public class OntoTermDiscovererTest
 	@Test
 	public void testBasics ()
 	{
-		OntologyTermDiscoverer client = new ZoomaOntoTermDiscoverer ( new ZOOMASearchClient (), 50f );
+		ZOOMASearchClient zclient = new ZOOMASearchClient ( ZOOMA_BASE_URL );
+		zclient.setMinConfidence ( AnnotationPrediction.Confidence.fromScore ( 50d ) );
+		zclient.setOrderedResults ( true );
+		
+		OntologyTermDiscoverer client = new ZoomaOntoTermDiscoverer ( zclient );
 		List<DiscoveredTerm> terms = client.getOntologyTerms ( "homo sapiens", "specie" );
 
 		log.info ( "Discovered terms for Homo Sapiens:\n" + terms );
@@ -72,7 +76,9 @@ public class OntoTermDiscovererTest
 		ConcurrentMap<String, List<DiscoveredTerm>> baseCache = cache.asMap ();
 		
 		OntologyTermDiscoverer client = new CachedOntoTermDiscoverer ( 
-			new ZoomaOntoTermDiscoverer ( new ZOOMASearchClient () ), new OntoTermDiscoveryMemCache ( baseCache )
+			new ZoomaOntoTermDiscoverer ( 
+				new ZOOMASearchClient ( ZOOMA_BASE_URL ) ),
+				new OntoTermDiscoveryMemCache ( baseCache )
 		);
 		
 		timer.start ();

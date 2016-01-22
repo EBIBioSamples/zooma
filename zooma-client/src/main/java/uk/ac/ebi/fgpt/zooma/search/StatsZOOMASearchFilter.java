@@ -1,11 +1,8 @@
 package uk.ac.ebi.fgpt.zooma.search;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Map;
+import java.util.List;
 
-import uk.ac.ebi.fgpt.zooma.model.Annotation;
-import uk.ac.ebi.fgpt.zooma.model.AnnotationSummary;
+import uk.ac.ebi.fgpt.zooma.model.AnnotationPrediction;
 import uk.ac.ebi.fgpt.zooma.model.Property;
 import uk.ac.ebi.utils.runcontrol.ChainExecutor;
 import uk.ac.ebi.utils.runcontrol.DynamicRateExecutor;
@@ -15,8 +12,6 @@ import uk.ac.ebi.utils.runcontrol.StatsExecutor;
  * A wrapper of {@link ZOOMASearchFilter}, which dynamically logs usage statistics (no of calls, throughput, etc).
  * It also has a capability to throttle the client throughput, so that the server is not crashed by too many
  * requests.
- * 
- * TODO: support new methods, as explained in {@link ZOOMASearchInterface}.
  *
  * <dl><dt>date</dt><dd>16 Nov 2014</dd></dl>
  * @author Marco Brandizi
@@ -100,61 +95,23 @@ public class StatsZOOMASearchFilter extends ZOOMASearchFilter
 	);  
 
 
-	public StatsZOOMASearchFilter ( ZOOMASearchInterface base )
+	public StatsZOOMASearchFilter ( AbstractZOOMASearch base )
 	{
 		super ( base );
 	}
-
 	
+
 	@Override
-	public Map<AnnotationSummary, Float> searchZOOMA ( 
-		final Property property, final float score, final boolean excludeType, final boolean noEmptyResult 
-	)
+	public List<AnnotationPrediction> annotate ( final Property property )
 	{
 		@SuppressWarnings ( "unchecked" )
-		final Map<AnnotationSummary, Float>[] result = new Map [ 1 ];
+		final List<AnnotationPrediction>[] result = new List [ 1 ];
 		wrapExecutor.execute ( new Runnable () {
 			@Override	
 			public void run () {
-				result [ 0 ] = base.searchZOOMA ( property, score, excludeType, noEmptyResult );
+				result [ 0 ] = base.annotate ( property );
 			}
 		});
-		return result [ 0 ];
-	}
-
-	@Override
-	public Annotation getAnnotation ( final URI annotationURI )
-	{
-		final Annotation[] result = new Annotation[ 1 ];
-		wrapExecutor.execute ( new Runnable () {
-			@Override	
-			public void run () {
-				result [ 0 ] = base.getAnnotation ( annotationURI );
-			}
-		});
-		return result [ 0 ];
-	}
-
-	@Override
-	public String getLabel ( final URI uri ) throws IOException
-	{
-		final String[] result = new String[ 1 ];
-		final IOException[] exs = new IOException [ 1 ];
-		
-		wrapExecutor.execute ( new Runnable () {
-			@Override	
-			public void run () 
-			{
-				exs [ 0 ] = null;
-				try {
-					result [ 0 ] = base.getLabel ( uri );
-				}
-				catch ( IOException ex ) {
-					exs [ 0 ] = ex;
-				}
-			}
-		});
-		if ( exs [ 0 ] != null ) throw exs [ 0 ];
 		return result [ 0 ];
 	}
 

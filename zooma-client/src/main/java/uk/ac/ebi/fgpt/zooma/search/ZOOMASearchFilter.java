@@ -1,21 +1,16 @@
 package uk.ac.ebi.fgpt.zooma.search;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Map;
+import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import uk.ac.ebi.fgpt.zooma.model.Annotation;
-import uk.ac.ebi.fgpt.zooma.model.AnnotationSummary;
+import uk.ac.ebi.fgpt.zooma.model.AnnotationPrediction;
+import uk.ac.ebi.fgpt.zooma.model.AnnotationPrediction.Confidence;
 import uk.ac.ebi.fgpt.zooma.model.Property;
 
 /**
- * A filter for {@link ZOOMASearchInterface}, which is intended to implement decorators, performing some additional
+ * A filter for {@link AbstractZOOMASearch}, which is intended to implement decorators, performing some additional
  * operations before/after the upstream call. For example, @see {@link StatsZOOMASearchFilter}.
  * 
- * TODO: support new methods, as explained in {@link ZOOMASearchInterface}.
+ * TODO: support new methods, as explained in {@link AbstractZOOMASearch}.
  *
  *
  * @author brandizi
@@ -24,38 +19,21 @@ import uk.ac.ebi.fgpt.zooma.model.Property;
  */
 public class ZOOMASearchFilter extends AbstractZOOMASearch
 {
-	protected ZOOMASearchInterface base;
-		
-	public ZOOMASearchFilter ( ZOOMASearchInterface base )
+	protected AbstractZOOMASearch base;
+	
+	public ZOOMASearchFilter ( AbstractZOOMASearch base )
 	{
 		super ();
 		this.base = base;
 	}
 
 	@Override
-	public Map<String, String> getPrefixMappings () throws IOException
+	public List<AnnotationPrediction> annotate ( Property property )
 	{
-		return base.getPrefixMappings ();
+		return base.annotate ( property );
 	}
 
-	@Override
-	public Map<AnnotationSummary, Float> searchZOOMA ( Property property, float score, boolean excludeType, boolean noEmptyResult )
-	{
-		return base.searchZOOMA ( property, score, excludeType, noEmptyResult );
-	}
-
-	@Override
-	public Annotation getAnnotation ( URI annotationURI )
-	{
-		return base.getAnnotation ( annotationURI );
-	}
-
-	@Override
-	public String getLabel ( URI uri ) throws IOException
-	{
-		return base.getLabel ( uri );
-	}
-
+	
 	@Override
 	public int getMaxPropertyValueLength ()
 	{
@@ -78,6 +56,46 @@ public class ZOOMASearchFilter extends AbstractZOOMASearch
 	public void setMaxPropertyTypeLength ( int maxPropertyTypeLength )
 	{
 		base.setMaxPropertyTypeLength ( maxPropertyTypeLength );
+	}
+
+	public List<String> getRequiredSources ()
+	{
+		return base.getRequiredSources ();
+	}
+
+	public void setRequiredSources ( List<String> requiredSources )
+	{
+		base.setRequiredSources ( requiredSources );
+	}
+
+	public List<String> getPreferredSources ()
+	{
+		return base.getPreferredSources ();
+	}
+
+	public void setPreferredSources ( List<String> preferredSources )
+	{
+		base.setPreferredSources ( preferredSources );
+	}
+
+	public Confidence getMinConfidence ()
+	{
+		return base.getMinConfidence ();
+	}
+
+	public void setMinConfidence ( Confidence minConfidence )
+	{
+		base.setMinConfidence ( minConfidence );
+	}
+
+	public boolean isOrderedResults ()
+	{
+		return base.isOrderedResults ();
+	}
+
+	public void setOrderedResults ( boolean isOrderedResults )
+	{
+		base.setOrderedResults ( isOrderedResults );
 	}
 	
 }
