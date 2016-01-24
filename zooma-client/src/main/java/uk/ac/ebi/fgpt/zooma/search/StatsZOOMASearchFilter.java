@@ -72,7 +72,7 @@ public class StatsZOOMASearchFilter extends ZOOMASearchFilter
 	
 			if ( this.rateLimiter.getRate () == Double.MAX_VALUE ) {
 				// Wasn't throttling, starting now
-				log.info ( "Throttling ZOOMA to avoid server crashing, calls are slowed down by {}ms per call", delay );
+				log.info ( "Throttling ZOOMA to avoid server crashing, calls are slowed down to {}s per call", delay );
 			}
 		
 			return 1d / delay;
