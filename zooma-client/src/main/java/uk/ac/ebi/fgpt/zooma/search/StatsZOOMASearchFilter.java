@@ -55,10 +55,9 @@ public class StatsZOOMASearchFilter extends ZOOMASearchFilter
 			
 			if ( failedCalls <= 0.1 ) 
 			{
-				if ( this.rateLimiter.getRate () != Double.MAX_VALUE ) {
+				if ( this.rateLimiter.getRate () != Double.MAX_VALUE )
 					// was throttling, going back to normal
 					log.info ( "ZOOMA back to good performance, throttling ends" );
-				}
 				return Double.MAX_VALUE;
 			}
 	
@@ -70,10 +69,9 @@ public class StatsZOOMASearchFilter extends ZOOMASearchFilter
 				: failedCalls <= 0.70 ? 60d
 				: 5 * 60d; 
 	
-			if ( this.rateLimiter.getRate () == Double.MAX_VALUE ) {
+			if ( this.rateLimiter.getRate () == Double.MAX_VALUE )
 				// Wasn't throttling, starting now
 				log.info ( "Throttling ZOOMA to avoid server crashing, calls are slowed down to {}s per call", delay );
-			}
 		
 			return 1d / delay;
 		}
