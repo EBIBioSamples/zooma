@@ -61,8 +61,8 @@ public class StatsZOOMASearchFilter extends ZOOMASearchFilter
 				return Double.MAX_VALUE;
 			}
 	
-			// The thresholds are related to twice their values most of the time, eg, 
-			// previous checkpoint it was 0, then it becomes 35, average is 17.5
+			// Degrade the performance gently
+			//
 			double delay = 
 				failedCalls <= 0.30 ? 0.5d 
 				: failedCalls <= 0.50 ? 5d 
